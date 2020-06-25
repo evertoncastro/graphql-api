@@ -5,9 +5,9 @@ const typeDefs = `
   type Transfer {
     date: String
     description: String
-    brl_value: String
-    usd_value: String
-    eur_value: String
+    BRL: String
+    EUR: String
+    USD: String
   }
   type Query {
     getTransferProPlan(sourceUrl: String!): Transfer

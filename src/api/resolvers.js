@@ -1,12 +1,17 @@
+import { CurrencyConverter } from './../services/currency';
+
 export default {
   Query: {
-    getTransferProPlan(_, { sourceUrl }) {
+    async getTransferProPlan(_, { sourceUrl }) {
+      const valueFromCrawler = 7;
+      const currencyConverter = await new CurrencyConverter('BRL');
+      const currencyData = currencyConverter.getConvertedData(valueFromCrawler);
       return {
         date: '2020-06-23',
         description: 'Fake info',
-        brl_value: '0,00',
-        usd_value: '0,00',
-        eur_value: '0,00',
+        BRL: currencyData.BRL,
+        EUR: currencyData.EUR,
+        USD: currencyData.USD,
       };
     },
   },
