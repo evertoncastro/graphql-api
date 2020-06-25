@@ -1,5 +1,4 @@
 import Crawler from 'crawler';
-import { raw } from 'express';
 
 class BaseCrawler {
   constructor(url, timeout, retries) {
