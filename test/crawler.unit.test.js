@@ -66,13 +66,20 @@ describe('BaseCrawler class', () => {
 describe('TransferProValueCrawler class', () => {
   it('should parse raw currency text', function () {
     let crl = new TransferProValueCrawler('https://someurl.com', 1000, 1);
-    const data = crl.parseText('R$ 9,15');
-    assert.equal(data, 9.15);
+    const data = crl.parseText({ tax: 'R$ 9,15', description: ' Fake ' });
+    assert.deepEqual(data, { tax: 9.15, description: 'Fake' });
   });
 
-  it('should throw error for unexpected data pattern', function () {
+  it('should throw error for unexpected tax pattern', function () {
     let crl = new TransferProValueCrawler('https://someurl.com', 1000, 1);
-    expect(() => crl.parseText('9,15')).to.throw(
+    expect(() => crl.parseText({ tax: '9,15' })).to.throw(
+      'Issue traying to extract data'
+    );
+  });
+
+  it('should throw error for empty description', function () {
+    let crl = new TransferProValueCrawler('https://someurl.com', 1000, 1);
+    expect(() => crl.parseText({ tax: 'R$ 9,15' })).to.throw(
       'Issue traying to extract data'
     );
   });
@@ -80,11 +87,13 @@ describe('TransferProValueCrawler class', () => {
   it('should return value, description and datetime', async function () {
     let crl = new TransferProValueCrawler('https://someurl.com', 1000, 1);
     stub(crl, 'fetch').resolves({});
-    stub(crl, 'getRawDataText').returns({});
-    stub(crl, 'parseText').returns(10);
+    stub(crl, 'getRawDataText').returns({
+      tax: 'R$ 10',
+      description: ' Fake ',
+    });
     const data = await crl.getData();
-    assert.equal(data.value, 10);
-    assert.equal(data.description, '');
+    assert.equal(data.tax, 10);
+    assert.equal(data.description, 'Fake');
     assert.isDefined(data.datetime);
   });
 });

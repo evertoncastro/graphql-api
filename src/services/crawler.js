@@ -1,4 +1,5 @@
 import Crawler from 'crawler';
+import cheerio from 'cheerio';
 import currencyFormatter from 'currency-formatter';
 import Moment from 'moment-timezone';
 
@@ -11,10 +12,9 @@ class BaseCrawler {
 
   async getData() {
     const rawData = await this.fetch();
-    const rawText = this.getRawDataText(rawData);
+    const rawTextObject = this.getRawDataText(rawData);
     return {
-      value: this.parseText(rawText),
-      description: '',
+      ...this.parseText(rawTextObject),
       datetime: Moment().tz('America/Sao_Paulo').format(),
     };
   }
@@ -59,16 +59,33 @@ class TransferProValueCrawler extends BaseCrawler {
   }
 
   getRawDataText(rawData) {
-    const value = rawData('.tarifas-2-2-2').text();
-    return value;
-  }
-
-  parseText(rawText) {
-    if (rawText.includes('R$') == false) {
+    try {
+      const taxElement = rawData('.tarifas-2-2-2');
+      const parentHtml = taxElement.parent().html();
+      const parentHtmlObj = cheerio.load(parentHtml);
+      return {
+        tax: taxElement.text(),
+        description: parentHtmlObj('.cell-small-title').text(),
+      };
+    } catch (e) {
+      console.log(e);
       //TODO: Send an alert to check possible site modification
       throw new Error('Issue traying to extract data');
     }
-    return currencyFormatter.unformat(rawText, { code: 'BRL' });
+  }
+
+  parseText(rawTextObject) {
+    if (
+      rawTextObject.tax.includes('R$') == false ||
+      !rawTextObject.description
+    ) {
+      //TODO: Send an alert to check possible site modification
+      throw new Error('Issue traying to extract data');
+    }
+    return {
+      tax: currencyFormatter.unformat(rawTextObject.tax, { code: 'BRL' }),
+      description: rawTextObject.description.trim(),
+    };
   }
 }
 
