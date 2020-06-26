@@ -1,7 +1,9 @@
-import 'dotenv/config';
 import express from 'express';
 import graphqlHTTP from 'express-graphql';
 import schema from './api/schema';
+
+const PORT = 8080;
+const HOST = '0.0.0.0';
 
 const app = express();
 app.use(
@@ -11,8 +13,8 @@ app.use(
     graphiql: true,
   })
 );
-app.listen(4000, () =>
-  console.log('Running a GraphQL API at http://localhost:4000/graphql')
+app.listen(PORT, HOST, () =>
+  console.log(`Running a GraphQL API at http://${HOST}:${PORT}`)
 );
 
 export default app;

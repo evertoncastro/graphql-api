@@ -1,4 +1,8 @@
+# PROJECT
 .env
-
-.vscode/
 node_modules/
+build/
+
+# IDE
+.vscode/
+node_modules

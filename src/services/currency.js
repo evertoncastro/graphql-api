@@ -14,6 +14,9 @@ class CurrencyAPI {
     return new Promise((resolve, reject) => {
       get(`${this.url}${this.path}?symbols=${this.symbols}&base=${this.base}`)
         .then((response) => {
+          console.log(
+            `Data from currency api: ${JSON.stringify(response.data)}`
+          );
           resolve(this.parse(response.data));
         })
         .catch((error) => {

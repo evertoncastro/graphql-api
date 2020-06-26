@@ -12,6 +12,7 @@ export default {
         2000,
         3
       ).getData();
+      console.log(`Crawler data: ${JSON.stringify(crawlerData)}`);
       const currencyConverter = await new CurrencyConverter('BRL');
       const currencyData = currencyConverter.getConvertedData(
         crawlerData.value
