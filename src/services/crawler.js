@@ -1,4 +1,6 @@
 import Crawler from 'crawler';
+import currencyFormatter from 'currency-formatter';
+import Moment from 'moment-timezone';
 
 class BaseCrawler {
   constructor(url, timeout, retries) {
@@ -9,7 +11,12 @@ class BaseCrawler {
 
   async getData() {
     const rawData = await this.fetch();
-    return this.parseData(rawData);
+    const rawText = this.getRawDataText(rawData);
+    return {
+      value: this.parseText(rawText),
+      description: '',
+      datetime: Moment().tz('America/Sao_Paulo').format(),
+    };
   }
 
   fetch() {
@@ -26,12 +33,23 @@ class BaseCrawler {
           }
           done();
         },
+        jQuery: {
+          name: 'cheerio',
+          options: {
+            normalizeWhitespace: true,
+            xmlMode: true,
+          },
+        },
       }).queue(this.url);
     });
   }
 
-  parseData() {
-    throw new Error('You have to implement the method parseData!');
+  getRawDataText() {
+    throw new Error('You have to implement the method getRawDataText!');
+  }
+
+  parseText() {
+    throw new Error('You have to implement the method parseText!');
   }
 }
 
@@ -40,8 +58,17 @@ class TransferProValueCrawler extends BaseCrawler {
     super(url, timeout, retries);
   }
 
-  parseData(rawData) {
-    return rawData('#tarifas-2').text();
+  getRawDataText(rawData) {
+    const value = rawData('.tarifas-2-2-2').text();
+    return value;
+  }
+
+  parseText(rawText) {
+    if (rawText.includes('R$') == false) {
+      //TODO: Send an alert to check possible site modification
+      throw new Error('Issue traying to extract data');
+    }
+    return currencyFormatter.unformat(rawText, { code: 'BRL' });
   }
 }
 

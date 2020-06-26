@@ -1,4 +1,5 @@
 import { CurrencyConverter } from './../services/currency';
+import { TransferProValueCrawler } from './../services/crawler';
 
 export default {
   Query: {
@@ -6,17 +7,17 @@ export default {
       if (sourceUrl != 'https://www.smartmei.com.br') {
         throw new Error('Please, send a valid smartmei url');
       }
-      const crawlerData = {
-        value: 7.0,
-        description: 'Fake info',
-        date: '2020-06-25 19:25:56',
-      };
+      const crawlerData = await new TransferProValueCrawler(
+        sourceUrl,
+        2000,
+        3
+      ).getData();
       const currencyConverter = await new CurrencyConverter('BRL');
       const currencyData = currencyConverter.getConvertedData(
         crawlerData.value
       );
       return {
-        date: crawlerData.date,
+        datetime: (await crawlerData).datetime,
         description: crawlerData.description,
         BRL: currencyData.BRL,
         EUR: currencyData.EUR,

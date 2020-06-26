@@ -9,17 +9,35 @@ describe('API ', () => {
       .post('/graphql')
       .send({
         query:
-          '{ getTransferProPlan(sourceUrl: "https://www.smartmei.com.br") { date, description, BRL, EUR, USD } }',
+          '{ getTransferProPlan(sourceUrl: "https://www.smartmei.com.br") { datetime, description, BRL, EUR, USD } }',
       })
       .expect('Content-Type', 'application/json; charset=utf-8')
       .expect(200)
       .end(function (err, res) {
         if (err) throw err;
-        assert.isDefined(res.body.data.getTransferProPlan.date);
+        assert.isDefined(res.body.data.getTransferProPlan.datetime);
         assert.isDefined(res.body.data.getTransferProPlan.description);
         assert.isDefined(res.body.data.getTransferProPlan.BRL);
         assert.isDefined(res.body.data.getTransferProPlan.EUR);
         assert.isDefined(res.body.data.getTransferProPlan.USD);
+        done();
+      });
+  });
+
+  it('should receive bad request for invalid url', (done) => {
+    request(app)
+      .post('/graphql')
+      .send({
+        query:
+          '{ getTransferProPlan(sourceUrl: "https://www.otheraddress.com") { datetime, description, BRL, EUR, USD } }',
+      })
+      .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(200)
+      .end(function (err, res) {
+        assert.equal(
+          JSON.parse(res.text).errors[0].message,
+          'Please, send a valid smartmei url'
+        );
         done();
       });
   });

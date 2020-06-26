@@ -3,7 +3,7 @@ import resolvers from './resolvers';
 
 const typeDefs = `
   type Transfer {
-    date: String
+    datetime: String
     description: String
     BRL: String
     EUR: String
