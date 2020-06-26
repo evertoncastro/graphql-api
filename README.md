@@ -13,7 +13,6 @@
 
 ### Running on localhost
 
----
 with npm
 
 ```
@@ -32,15 +31,17 @@ Browse playground at: http://localhost:8080/graphql
 
 ---
 
-### Running with docker
-
-### Tests
+### Automatic tests
 
 ```
 npm run test
 or
 yarn test
 ```
+
+---
+
+### Running with docker
 
 ```
 docker build -t application/graphql-api:0.1 .
